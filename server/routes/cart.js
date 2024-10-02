@@ -21,9 +21,4 @@ router.patch("/:productId/remove-from-cart", verify, cartController.removeFromCa
 // Clear cart
 router.put("/clear-cart", verify, cartController.clearCart);
 
-// Add to cart when no cart exists
-router.post("/add-to-cart-no-cart", verify, cartController.addToCartNoCart);
-
-
-
 module.exports = router;

@@ -8,13 +8,6 @@ import { Suspense, lazy } from "react";
 
 // Pages and Components
 import AppNavbar from "./components/AppNavbar";
-/*import Home from "./pages/Home";
-import Register from "./pages/Register";
-import Login from "./pages/Login";
-import Logout from "./pages/Logout";
-import Products from "./pages/Products";
-import ProductView from "./pages/ProductView";
-import Cart from "./pages/Cart";*/
 
 // Lazy Load Pages
 const Home = lazy(() => import("./pages/Home"));

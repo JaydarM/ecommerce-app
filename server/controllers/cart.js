@@ -189,47 +189,6 @@ module.exports.clearCart = async (req, res) => {
 	} catch (error) {
 			res.status(500).json({ message: error.message });
 	}
-};
-
-// Add To Cart When No Cart Exists
-module.exports.addToCartNoCart = async (req, res) => {
-	try {
-			if (req.user.isAdmin) {
-					return res.status(403).json({ message: "Admin is forbidden" });
-			}
-
-			// Extract product details from the request body
-			const { productId, quantity, price } = req.body;
-
-			if (!productId || !quantity || !price) {
-					return res.status(400).json({ message: "Product ID, quantity, and price are required" });
-			}
-
-			// Calculate the subtotal for the product
-			const subtotal = quantity * price;
-
-			// Create a new cart with the product
-			const newCart = new Cart({
-					userId: req.user.id,
-					cartItems: [{
-							productId: productId,
-							quantity: quantity,
-							subtotal: subtotal
-					}],
-					totalPrice: subtotal
-			});
-
-			// Save the new cart
-			const savedCart = await newCart.save();
-
-			res.status(201).json({
-					message: "Cart created and item added successfully",
-					cart: savedCart
-			});
-
-	} catch (error) {
-			res.status(500).json({ message: error.message });
-	}
-};
+}
 
 

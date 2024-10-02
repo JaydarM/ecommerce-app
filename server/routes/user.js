@@ -21,4 +21,7 @@ router.patch("/:id/set-as-admin", verify, verifyAdmin, userController.setAsAdmin
 // Route to Update Password
 router.patch("/update-password", verify, userController.updatePassword);
 
+// Route to Get User List
+router.get("/users", verify, verifyAdmin, userController.getAllUsers);
+
 module.exports = router;
