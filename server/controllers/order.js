@@ -4,19 +4,20 @@ const Product = require("../models/Product");
 
 // Checkout - Create Order
 module.exports.checkout = async (req, res) => {
+
     try {
+
         if (req.user.isAdmin) {
             return res.status(403).json({ message: "Admin is forbidden" });
         }
 
         // Find user's cart
         const cart = await Cart.findOne({ userId: req.user.id });
-
         if (!cart || cart.cartItems.length === 0) {
-            return res.status(404).json({ error: "No Items to Checkout" });
+            res.status(404).json({ error: "No Items to Checkout" });
         }
 
-        // Prepare the order details
+        // Prepare Ordered Products List
         const productsOrdered = cart.cartItems.map(item => ({
             productId: item.productId,
             quantity: item.quantity,
@@ -39,18 +40,20 @@ module.exports.checkout = async (req, res) => {
         await cart.save();
 
         res.status(201).json({
-            message: "Ordered Successfully"
+            message: "Ordered Successfully",
+            order: savedOrder
         });
 
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
+    } catch(error) {errorHandler(error, req, res)}
+
+}
 
 
 // Get User's Orders
 module.exports.getOrders = async (req, res) => {
+
     try {
+
         if (req.user.isAdmin) {
             return res.status(403).json({ message: "Admin is forbidden" });
         }
@@ -63,14 +66,16 @@ module.exports.getOrders = async (req, res) => {
         } else {
             res.status(404).json({ message: "No orders found for this user" });
         }
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
+
+    } catch(error) {errorHandler(error, req, res)}
+
+}
 
 // Get All Orders (Admin)
 module.exports.getAllOrders = async (req, res) => {
+
     try {
+        
         const orders = await Order.find();
 
         if (orders.length > 0) {
@@ -79,8 +84,7 @@ module.exports.getAllOrders = async (req, res) => {
             res.status(404).json({error: "No orders found"});
         }
 
-    } catch (error) {
-        res.status(500).json({message: error.message});
-    }
+    } catch(error) {errorHandler(error, req, res)}
+
 }
 

@@ -139,12 +139,12 @@ module.exports.getAllUsers = async (req, res) => {
 
 	try {
 
-		if (!req.user.isAdmin) {
+		/*if (!req.user.isAdmin) {
 			res.status(403).json({
                 auth: "Failed",
                 message: "Action Forbidden"
             });
-		}
+		}*/
 
 		const userList = await User.find({});
 		res.status(200).json(userList);
