@@ -70,7 +70,7 @@ module.exports.searchProductName = async (req, res) => {
 
         const productName = req.body.name;
         const products = await Product.find({
-            name: {$regex: new RegExp("^" + productName, "i")},
+            name: {$regex: new RegExp(productName, "i")},
             isActive: true
         });
 
@@ -93,7 +93,10 @@ module.exports.searchProductInPriceRange = async (req, res) => {
         const maxPrice = req.body.maxPrice;
 
         if (typeof minPrice !== "number" || typeof maxPrice !== "number") {
-            res.status(400).send({error: "Please enter a number"});
+            res.status(400).json({error: "Please enter a number"});
+        }
+        if (minPrice > maxPrice) {
+            res.status(400).json({error: "Min Price must be less than Max Price"});
         }
 
         const products = await Product.find({
@@ -161,7 +164,7 @@ module.exports.archiveProduct = async (req, res) => {
 module.exports.activateProduct = async (req, res) => {
 
     try {
-        
+
         const findProduct = await Product.findById(req.params.id);
         if (!findProduct) {
             return res.status(404).json({error: "Product not found"});

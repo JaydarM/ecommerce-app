@@ -9,22 +9,16 @@ const { verify, verifyAdmin } = auth;
 router.post('/', verify, verifyAdmin, productController.createProduct);
 
 // Retrieve all products (Admin only)
-router.get('/all', verify, verifyAdmin, productController.getAllProducts);
-
-// Retrieve all active products
-router.get('/active', productController.getActiveProducts);
+router.get('/', verify, verifyAdmin, productController.getAllProducts);
 
 // Retrieve single product
 router.get('/:id', productController.getProductById);
 
-// Search product by name
-router.post("/search-by-name", productController.searchProductName);
-
-// Search product in price range
-router.post("/search-by-price", productController.searchProductInPriceRange);
+// Retrieve all active products
+router.get('/active', productController.getActiveProducts);
 
 // Update Product information (Admin only)
-router.patch('/:id/update', verify, verifyAdmin, productController.updateProduct);
+router.patch('/:id', verify, verifyAdmin, productController.updateProduct);
 
 // Archive Product (Admin only)
 router.patch('/:id/archive', verify, verifyAdmin, productController.archiveProduct);
@@ -32,5 +26,10 @@ router.patch('/:id/archive', verify, verifyAdmin, productController.archiveProdu
 // Activate Product (Admin only)
 router.patch('/:id/activate', verify, verifyAdmin, productController.activateProduct);
 
+// Search product by name
+router.post("/search-by-name", productController.searchProductName);
+
+// Search product in price range
+router.post("/search-by-price", productController.searchProductInPriceRange);
 
 module.exports = router;

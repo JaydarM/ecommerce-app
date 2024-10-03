@@ -30,13 +30,18 @@ module.exports.addToCart = async (req, res) => {
 	try {
 
 		if (req.user.isAdmin) {
-			return res.status(403).json({message: "Admin is forbidden"});
+			res.status(403).json({message: "Admin is forbidden"});
+		}
+
+		const productInfo = await Product.findById(req.body.productId);
+		if (productInfo === null) {
+			res.status(404).json({error: "Product Not Found"});
 		}
 
 		const productToAdd = {
 			productId: req.body.productId,
 			quantity: req.body.quantity,
-			subtotal: req.body.subtotal
+			subtotal: req.body.quantity * productInfo.price
 		};
 
 		const cart = await Cart.findOne({userId: req.user.id});
@@ -136,7 +141,7 @@ module.exports.removeFromCart = async (req, res) => {
 			return res.status(404).json({ error: "No cart found" });
 		}
 
-		const productId = req.params.productId;
+		const productId = req.body.productId;
 
 		// Find index of product to remove
 		const productIndex = cart.cartItems.findIndex(item => item.productId.toString() === productId);

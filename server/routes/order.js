@@ -10,9 +10,9 @@ const router = express.Router();
 router.post("/checkout", verify, orderController.checkout);
 
 // Get User's Orders
-router.get("/my-orders", verify, orderController.getOrders);
+router.get("/", verify, orderController.getOrders);
 
 // Get All Orders
-router.get("/all-orders", verify, verifyAdmin, orderController.getAllOrders);
+router.get("/all", verify, verifyAdmin, orderController.getAllOrders);
 
 module.exports = router;

@@ -64,13 +64,13 @@ module.exports.userAuthentication = async (req, res) => {
 		const user = await User.findOne({email: req.body.email});
 		if (user === null) {
 			res.status(404).json({error: "Email not found"});
-		}
-
-		const isPasswordCorrect = await bcrypt.compareSync(req.body.password, user.password);
-		if (isPasswordCorrect === false) {
-			res.status(401).json({error: "Email and password do not match"});
 		} else {
-			res.status(200).json({access: auth.createAccessToken(user)});
+			const isPasswordCorrect = await bcrypt.compareSync(req.body.password, user.password);
+			if (isPasswordCorrect === false) {
+				res.status(401).json({error: "Email and password do not match"});
+			} else {
+				res.status(200).json({access: auth.createAccessToken(user)});
+			}
 		}
 
 	} catch(error) {errorHandler(error, req, res)}

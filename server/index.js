@@ -19,23 +19,23 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
 const corsOptions = {
-    origin: ['http://localhost:3000', "http://zuitt-bootcamp-prod-460-7854-maguyon.s3-website.us-east-1.amazonaws.com", 'http://zuitt-bootcamp-prod-460-7861-madrazo.s3-website.us-east-1.amazonaws.com' ], 
+    origin: ['http://localhost:3000', 'http://zuitt-bootcamp-prod-460-7861-madrazo.s3-website.us-east-1.amazonaws.com'], 
     credentials: true, 
     optionsSuccessStatus: 200 
 };
 app.use(cors(corsOptions));
 
 // Use users routes
-app.use("/b3/users", userRoutes);
+app.use("/users", userRoutes);
 
 // Use product routes
-app.use("/b3/products", productRoutes);
+app.use("/products", productRoutes);
 
 // Use cart routes
-app.use("/b3/cart", cartRoutes);
+app.use("/cart", cartRoutes);
 
 // Use orders routes
-app.use("/b3/orders", orderRoutes); 
+app.use("/orders", orderRoutes); 
 
 
 

@@ -7,18 +7,18 @@ const { verify, verifyAdmin } = auth;
 const router = express.Router();
 
 // Retrieve user's cart
-router.get("/get-cart", verify, cartController.getCart);
+router.get("/", verify, cartController.getCart);
 
 // Add to cart
-router.post("/add-to-cart", verify, cartController.addToCart);
+router.post("/", verify, cartController.addToCart);
 
 // Change Product Quanitites in cart
-router.patch("/update-cart-quantity", verify, cartController.updateCartQuantity);
+router.patch("/update-quantity", verify, cartController.updateCartQuantity);
 
 // Remove from cart
-router.patch("/:productId/remove-from-cart", verify, cartController.removeFromCart);
+router.patch("/remove", verify, cartController.removeFromCart);
 
 // Clear cart
-router.put("/clear-cart", verify, cartController.clearCart);
+router.put("/clear", verify, cartController.clearCart);
 
 module.exports = router;
