@@ -30,6 +30,11 @@ module.exports.registerUser = async (req, res) => {
 		if (newUser.password.length < 8) {
 			res.status(400).json({error: "Password must be atleast 8 characters"});
 		}
+		// Check if Email is already used
+		const usedEmail = await User.findOne({email: newUser.email});
+		if (usedEmail) {
+			res.status(400).json({error: "Email already used"});
+		}
 		
 		await newUser.save();
 		res.status(201).json({

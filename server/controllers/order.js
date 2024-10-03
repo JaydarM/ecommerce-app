@@ -54,10 +54,6 @@ module.exports.getOrders = async (req, res) => {
 
     try {
 
-        if (req.user.isAdmin) {
-            return res.status(403).json({ message: "Admin is forbidden" });
-        }
-
         // Find orders for the user
         const orders = await Order.find({ userId: req.user.id });
 
@@ -75,7 +71,7 @@ module.exports.getOrders = async (req, res) => {
 module.exports.getAllOrders = async (req, res) => {
 
     try {
-        
+
         const orders = await Order.find();
 
         if (orders.length > 0) {
