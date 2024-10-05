@@ -2,35 +2,47 @@ import { useState, useEffect, useContext } from 'react';
 import { Navigate } from "react-router-dom";
 import UserContext from "../context/UserContext";
 
+// For Notification Messages
+import { Notyf } from 'notyf';
+import 'notyf/notyf.min.css';
+
 import OrderListView from "../components/OrderListView";
 
 export default function Order() {
+
+	const notyf = new Notyf();
 
 	const { user } = useContext(UserContext);
 
 	const [orders, setOrders] = useState([]);
 	const [hasOrders, setHasOrders] = useState(false);
 
-	const fetchOrderData = () => {
+	const fetchOrderData = async () => {
 
-		let fetchUrl = user.isAdmin === true ? `${process.env.REACT_APP_API_BASE_URL}/orders/all-orders` : `${process.env.REACT_APP_API_BASE_URL}/orders/my-orders`;
+		try {
 
-		fetch(fetchUrl, {
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${localStorage.getItem("token")}`
-			}
-		})
-		.then(res => res.json())
-		.then(data => {
-			console.log(data);
+			let fetchUrl = user.isAdmin === true ? `${process.env.REACT_APP_API_BASE_URL}/orders/all` : `${process.env.REACT_APP_API_BASE_URL}/orders/`;
+
+			const response = await fetch(fetchUrl, {
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${localStorage.getItem("token")}`
+				}
+			});
+
+			const data = await response.json();
 			if(data.message === "No orders found for this user" || data.error === "No orders found") {
 				setHasOrders(false);
 			} else {
 				setHasOrders(true);
 				setOrders(data.orders);
 			}
-		})
+
+		} catch (error) {
+            notyf.error("Something went wrong");
+            console.error(error);
+        }
+
 	}
 
 	useEffect(() => {

@@ -27,23 +27,25 @@ export default function AddProduct({ fetchData }) {
 		setPrice(0);
 	}
 
-	function createProduct(e) {
+	async function createProduct(e) {
 		e.preventDefault();
 
-		fetch(`${process.env.REACT_APP_API_BASE_URL}/products/`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${localStorage.getItem("token")}`
-			},
-			body: JSON.stringify({
-				name: name,
-				description: description,
-				price: price
-			})
-		})
-		.then(res => res.json())
-		.then(data => {
+		try {
+
+			const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products/`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${localStorage.getItem("token")}`
+				},
+				body: JSON.stringify({
+					name: name,
+					description: description,
+					price: price
+				})
+			});
+
+			const data = await response.json();
 			if(data.product !== undefined) {
 				notyf.success("Product Added");
 
@@ -53,10 +55,15 @@ export default function AddProduct({ fetchData }) {
                 closeAdd();
                 fetchData();
 			} else {
-				notyf.error("Error: Something Went Wrong.");
+				notyf.error("Something went wrong");
 				closeAdd();
 			}
-		})
+
+		} catch (error) {
+            notyf.error("Something went wrong");
+            console.error(error);
+        }
+
 	}
 
 	return (

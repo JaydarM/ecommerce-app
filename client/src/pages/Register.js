@@ -12,7 +12,7 @@ export default function Register() {
     const navigate = useNavigate();
 	const notyf = new Notyf();
 
-    const {user} = useContext(UserContext);
+    const { user } = useContext(UserContext);
 
     // Hooks
 	const [firstName, setFirstName] = useState("");
@@ -27,60 +27,62 @@ export default function Register() {
 
     // Activate Button if fields are Not Empty
     useEffect(() => {
-    	if ((firstName !== "" && lastName !== "" && email !== "" && mobileNo !== "" && password !== "" && confirmPassword !== "") && (password === confirmPassword) && (mobileNo.length === 11)) {
 
+    	if ((firstName !== "" && lastName !== "" && email !== "" && mobileNo !== "" && password !== "" && confirmPassword !== "") && 
+            (password === confirmPassword) && (mobileNo.length === 11)) {
     		setIsActive(true);
     	} else {
-
     		setIsActive(false);
     	}
+
     }, [firstName, lastName, email, mobileNo, password, confirmPassword])
 
-	function registerUser(e) {
+	async function registerUser(e) {
 
     	e.preventDefault();
 
-    	fetch(`${process.env.REACT_APP_API_BASE_URL}/users/register`, {
+        try {
 
-    		// Options
-    		method: "POST",
-    		headers: {
-    			"Content-Type": "application/json"
-    		},
-    		body: JSON.stringify({
-    			firstName: firstName,
-    			lastName: lastName,
-    			email: email,
-    			mobileNo: mobileNo,
-    			password: password
-    		})
-    	})
-    	.then(res => res.json())
-    	.then(data => {
+        	const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/users/register`, {
+        		method: "POST",
+        		headers: {
+        			"Content-Type": "application/json"
+        		},
+        		body: JSON.stringify({
+        			firstName: firstName,
+        			lastName: lastName,
+        			email: email,
+        			mobileNo: mobileNo,
+        			password: password
+        		})
+        	});
 
-    		// For Checking
-    		// console.log(data);
+            const data = await response.json();
+            if (data.message === "Registered Successfully") {
+                setFirstName("");
+                setLastName("");
+                setEmail("");
+                setMobileNo("");
+                setPassword("");
+                setConfirmPassword("");
 
-    		if (data.message === "Registered Successfully") {
-    			setFirstName("");
-    			setLastName("");
-    			setEmail("");
-    			setMobileNo("");
-    			setPassword("");
-    			setConfirmPassword("");
-
-    			notyf.success("Registration successful");
+                notyf.success("Registration successful");
                 navigate("/login");
-    		} else if (data.error === "Email is invalid") {
-    			notyf.error("Email is invalid");
-    		} else if (data.error === "Mobile number is invalid") {
-    			notyf.error("Mobile number is invalid");
-    		} else if (data.error === "Password must be atleast 8 characters long") {
-    			notyf.error("Password must be atleast 8 characters long");
-    		} else {
-    			notyf.error("Something went wrong");
-    		}
-    	})
+            } else if (data.error === "Email is invalid") {
+                notyf.error("Email is invalid");
+            } else if (data.error === "Mobile number is invalid") {
+                notyf.error("Mobile number is invalid");
+            } else if (data.error === "Password must be atleast 8 characters long") {
+                notyf.error("Password must be atleast 8 characters long");
+            } else {
+                notyf.error("Something went wrong");
+            }
+
+        } catch (error) {
+            notyf.error("Something went wrong");
+            console.error(error);
+        }
+
     }
 
 	return (

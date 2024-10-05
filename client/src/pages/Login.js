@@ -11,69 +11,78 @@ export default function Login() {
 
 	const notyf = new Notyf();
 
-	const {user, setUser} = useContext(UserContext);
+	const { user, setUser } = useContext(UserContext);
 
 	// Hooks
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
+	// Set Button Active or Disabled
 	const [isActive, setIsActive] = useState(false);
 
 	// Login Function
-	function authenticate (e) {
+	async function authenticate(e) {
 
     	e.preventDefault();
 
-    	fetch(`${process.env.REACT_APP_API_BASE_URL}/users/login`, {
-    		method: "POST",
-    		headers: {
-    			"Content-Type": "application/json"
-    		},
-    		body: JSON.stringify({
-    			email: email,
-    			password: password
-    		})
-    	})
-    	.then(res => res.json())
-    	.then(data => {
+    	try {
 
-    		// For checking
-    		//console.log(data);
+	    	const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/users/login`, {
+	    		method: "POST",
+	    		headers: {
+	    			"Content-Type": "application/json"
+	    		},
+	    		body: JSON.stringify({
+	    			email: email,
+	    			password: password
+	    		})
+	    	});
 
-    		if (data.access !== undefined) {
+	    	const data = await response.json();
+	    	if (data.access !== undefined) {
 
-    			//console.log(data.access);
+	    		localStorage.setItem("token", data.access);
+	    		retrieveUserDetails(data.access);
 
-    			localStorage.setItem("token", data.access);
-    			retrieveUserDetails(data.access);
+	    		setEmail("");
+	    		setPassword("");
 
-    			setEmail("");
-    			setPassword("");
+	    		notyf.success('Successful Login');
 
-    			notyf.success('Successful Login');
-    		} else if (data.message === "Email and password do not match") {
-    			notyf.error('Incorrect Credentials. Try Again');
-    		} else {
-    			notyf.error('User Not Found. Try Again.')
-    		}
-    	})
+	    	} else if (data.message === "Email and password do not match") {
+	    		notyf.error('Incorrect Credentials. Try Again');
+	    	} else {
+	    		notyf.error('User Not Found. Try Again.')
+	    	}
+
+    	} catch (error) {
+    		notyf.error("Something went wrong");
+            console.error(error);
+    	}
+
     }
 
-    function retrieveUserDetails (token) {
-		fetch(`${process.env.REACT_APP_API_BASE_URL}/users/details`, {
-			headers: {
-				Authorization: `Bearer ${token}`
-			}
-		})
-		.then(res => res.json())
-		.then(data => {
-			console.log(data);
+    async function retrieveUserDetails(token) {
 
+    	try {
+
+			const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/users/details`, {
+				headers: {
+					Authorization: `Bearer ${token}`
+				}
+			});
+
+			const data = await response.json();
 			setUser({
 				id: data._id,
 				isAdmin: data.isAdmin
-			})
-		})
+			});
+
+		} catch (error) {
+    		notyf.error("Something went wrong");
+            console.error(error);
+    	}
+
 	}
 
 	// For Login Button

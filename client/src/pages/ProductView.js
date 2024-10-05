@@ -19,40 +19,53 @@ export default function ProductView() {
 	const [price, setPrice] = useState(0);
 	const [quantity, setQuantity] = useState(1);
 
-	function addToCart(productId) {
+	async function addToCart(productId) {
 
-		fetch(`${process.env.REACT_APP_API_BASE_URL}/cart/add-to-cart`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${localStorage.getItem("token")}`
-			},
-			body: JSON.stringify({
-				productId: productId,
-				quantity: quantity,
-				subtotal: price * quantity
+		try {
+
+			const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/cart/`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${localStorage.getItem("token")}`
+				},
+				body: JSON.stringify({
+					productId: productId,
+					quantity: quantity,
+					subtotal: price * quantity
+				})
 			})
-		})
-		.then(res => res.json())
-		.then(data => {
+
+			const data = await response.json();
 			if (data.message === "Item added to cart successfully") {
 				notyf.success("Item Added to Cart");
 				navigate("/cart");
 			} else {
 				notyf.error("Something went wrong");
 			}
-		})
+
+		} catch (error) {
+    		notyf.error("Something went wrong");
+            console.error(error);
+    	}
+
 	}
 
 	useEffect(() => {
 
-		fetch(`${process.env.REACT_APP_API_BASE_URL}/products/${productId}`)
-		.then(res => res.json())
-		.then(data => {
-			setName(data.name);
-			setDescription(data.description);
-			setPrice(data.price);
-		})
+		const fetchProductInfo = async () => {
+			try {
+				const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products/${productId}`);
+				const data = await response.json();
+				setName(data.name);
+				setDescription(data.description);
+				setPrice(data.price);
+			} catch (error) {
+	    		notyf.error("Something went wrong");
+	            console.error(error);
+    		}
+		}
+		
 	}, [productId]);
 
 	return (

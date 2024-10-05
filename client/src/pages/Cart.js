@@ -19,14 +19,17 @@ export default function Cart() {
     const [cartItems, setCartItems] = useState([]);
     const [totalPrice, setTotalPrice] = useState(0);
 
-    const fetchData = () => {
-        fetch(`${process.env.REACT_APP_API_BASE_URL}/cart/get-cart`, {
-            headers: {
-                Authorization: `Bearer ${localStorage.getItem("token")}`
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
+    const fetchData = async () => {
+
+        try {
+
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/cart/`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            });
+
+            const data = await response.json();
             if (data.error === "No cart found" || data.cart.cartItems.length === 0) {
                 setTitle("Cart Empty");
                 setCartItems([]);
@@ -36,71 +39,90 @@ export default function Cart() {
                 setCartItems(data.cart.cartItems);
                 setTotalPrice(data.cart.totalPrice);
             }
-        })
-        .catch(error => console.error("Fetch error:", error));
+
+        } catch (error) {
+            notyf.error("Something went wrong");
+            console.error(error);
+        }
+
     }
 
     useEffect(() => {
         fetchData();
     }, []);
 
-    const removeItem = (productId) => {
-        fetch(`${process.env.REACT_APP_API_BASE_URL}/cart/${productId}/remove-from-cart`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
+    async function removeItem(productId) {
+
+        try {
+
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/cart/remove`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                },
+                body: JSON.stringify({
+                    productId: productId
+                })
+            });
+
+            const data = await response.json();
             if (data.message === "Item removed from cart successfully") {
                 setCartItems(cartItems.filter(item => item.productId !== productId));
             } else {
-                console.error("Error removing item:", data.message);
+                notyf.error("Something went wrong");
             }
-        })
-        .catch(error => console.error("Fetch error:", error));
-    };
 
-    const clearCart = () => {
-        fetch(`${process.env.REACT_APP_API_BASE_URL}/cart/clear-cart`, {
-            method: "PUT",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
+        } catch (error) {
+            notyf.error("Something went wrong");
+            console.error(error);
+        }
+
+    }
+
+    async function clearCart() {
+
+        try {
+
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/cart/clear`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            });
+
+            const data = await response.json();
             if (data.message === "Cart cleared successfully") {
                 setCartItems([]);
                 setTotalPrice(0);
             } else {
-                console.error("Error clearing cart:", data.message);
+                notyf.error("Something went wrong");
             }
-        })
-        .catch(error => console.error("Fetch error:", error));
-    };
 
-    const checkout = () => {
-        if (user.isAdmin) {
-            alert("Admin cannot checkout");
-            return;
+        } catch (error) {
+            notyf.error("Something went wrong");
+            console.error(error);
         }
 
-        fetch(`${process.env.REACT_APP_API_BASE_URL}/orders/checkout`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`
-            },
-            body: JSON.stringify({
-            	productsOrdered: cartItems
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
+    }
+
+    async function checkout() {
+
+        try {
+
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/orders/checkout`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                },
+                body: JSON.stringify({
+                    productsOrdered: cartItems
+                })
+            });
+
+            const data = await response.json();
             if (data.message === "Ordered Successfully") {
                 notyf.success("Checked Out Cart");
                 setCartItems([]);
@@ -108,12 +130,15 @@ export default function Cart() {
 
                 navigate("/orders");
             } else {
-            	notyf.error("Something went wrong");
-                console.error("Error placing order:", data.message);
+                notyf.error("Something went wrong");
             }
-        })
-        .catch(error => console.error("Fetch error:", error));
-    };
+
+        } catch (error) {
+            notyf.error("Something went wrong");
+            console.error(error);
+        }
+
+    }
 
     return (
         <>

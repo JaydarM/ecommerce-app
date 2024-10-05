@@ -15,7 +15,7 @@ export default function Logout() {
 		})
 	})
 
-	return(
+	return (
 		<Navigate to="/login" />
 	)
 }

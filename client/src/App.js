@@ -6,6 +6,10 @@ import { Route, Routes } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Suspense, lazy } from "react";
 
+// For Notification Messages
+import { Notyf } from 'notyf';
+import 'notyf/notyf.min.css';
+
 // Pages and Components
 import AppNavbar from "./components/AppNavbar";
 
@@ -21,6 +25,9 @@ const Orders = lazy(() => import("./pages/Orders"));
 
 function App() {
 
+  const notyf = new Notyf();
+
+  // Set Up User Context
   const [user, setUser] = useState({
     id: null,
     isAdmin: null
@@ -31,38 +38,40 @@ function App() {
     localStorage.clear();
   }
 
+  // Get User Details to stay logged in and set context
   useEffect(() => {
-    const token = localStorage.getItem("token");
 
-    if (token) {
-      fetch(`${process.env.REACT_APP_API_BASE_URL}/users/details`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.log(data.user)
-        console.log(data.user !== undefined)
+    const fetchUserData = async (token) => {
+      try {
 
-        // Keeps you logged in
-        if (data.user !== undefined) { 
+        const response = fetch(`${process.env.REACT_APP_API_BASE_URL}/users/details`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
+
+        if (data.user !== undefined) {
           setUser({
-            id: data.user._id,
-            isAdmin: data.user.isAdmin
-          })
-
-          //console.log(user);
-        } else {
-          setUser({
-            id: null,
-            isAdmin: null
+            id: data._id,
+            isAdmin: data.isAdmin
           });
+        } else {
+          notyf.error("Something went wrong");
         }
-      })
+
+      } catch (error) {
+        notyf.error("Something went wrong");
+        console.error(error);
+      }
     }
-    
-  }, [user.id])
+
+    const token =  localStorage.getItem("token");
+    if (token) {
+      fetchUserData(token);
+    }
+
+  }, [user.id]);
 
   return (
     <UserProvider value={{ user, setUser, unsetUser }}>
