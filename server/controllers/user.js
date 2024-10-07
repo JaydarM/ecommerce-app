@@ -84,7 +84,7 @@ module.exports.getUserDetails = async (req, res) => {
 
 		const user = await User.findOne({_id: req.user.id}, {password: 0});
 		if (user) {
-			res.status(200).json({user: user});
+			res.status(200).json(user);
 		} else {
 			res.status(404).json({error: "User not found"});
 		}

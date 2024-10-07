@@ -49,15 +49,18 @@ function App() {
             Authorization: `Bearer ${token}`
           }
         });
-        const data = await response.json();
 
-        if (data.user !== undefined) {
+        const data = await response.json;
+        if (data !== undefined) {
           setUser({
             id: data._id,
             isAdmin: data.isAdmin
           });
         } else {
-          notyf.error("Something went wrong");
+          setUser({
+            id: null,
+            isAdmin: null
+          });
         }
 
       } catch (error) {
