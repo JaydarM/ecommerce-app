@@ -1,7 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Card, Button } from 'react-bootstrap';
 
+// For Notification Messages
+import { Notyf } from 'notyf';
+import 'notyf/notyf.min.css';
+
 export default function CartItemCard({ cartItem, removeItem, fetchData }) {
+
+    const notyf = new Notyf();
+
     const { productId, quantity, subtotal } = cartItem;
 
     const [productName, setProductName] = useState("");
@@ -10,43 +17,58 @@ export default function CartItemCard({ cartItem, removeItem, fetchData }) {
     const [productQuantity, setProductQuantity] = useState(quantity);
     const [productSubtotal, setProductSubtotal] = useState(subtotal);
 
-    const getProductInfo = () => {
-        fetch(`${process.env.REACT_APP_API_BASE_URL}/products/${productId}`)
-        .then(res => res.json())
-        .then(data => {
+    const getProductInfo = async () => {
+
+        try {
+
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products/${productId}`);
+
+            const data = response.json();
             setProductName(data.name);
             setProductDescription(data.description);
             setProductPrice(data.price);
-        });
+
+        } catch (error) {
+            notyf.error("Something went wrong");
+            console.error(error);
+        }
+
     }
 
     useEffect(() => {
         getProductInfo();
     }, [productId]);
 
-    useEffect(() => {
-        const newSubtotal = productQuantity * productPrice;
+    const updateProductQuantity = async () => {
 
-        // Backend Connection
-        fetch(`${process.env.REACT_APP_API_BASE_URL}/cart/update-cart-quantity`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`
-            },
-            body: JSON.stringify({
-                productId: productId,
-                newQuantity: productQuantity
-            })
-        })
-        .then(res => res.json())
-        .then(data => {
+        try {
+
+            const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/cart/update-quantity`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                },
+                body: JSON.stringify({
+                    productId: productId,
+                    newQuantity: productQuantity
+                })
+            });
+
+            const data = response.json();
             if(data.message === "Item quantity updated successfully") {
-                setProductSubtotal(newSubtotal);
                 fetchData();
             }
-        })
 
+        } catch (error) {
+            notyf.error("Something went wrong");
+            console.error(error);
+        }
+
+    }
+
+    useEffect(() => {
+        updateProductQuantity();
     }, [productQuantity, productPrice]);
 
     const addOne = () => {

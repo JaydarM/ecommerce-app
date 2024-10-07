@@ -9,16 +9,19 @@ export default function ArchiveProduct({product, isActive, fetchData}) {
 
 	const productId = product._id;
 
-	const archiveToggle = () => {
-		fetch(`${process.env.REACT_APP_API_BASE_URL}/products/${productId}/archive`, {
-			method: "PATCH",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${localStorage.getItem("token")}`
-			}
-		})
-		.then(res => res.json())
-		.then(data => {
+	const archiveToggle = async () => {
+
+		try {
+
+			const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products/${productId}/archive`, {
+				method: "PATCH",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${localStorage.getItem("token")}`
+				}
+			});
+
+			const data = await response.json();
 			if(data.success === true) {
 				notyf.success("Successfully Archived");
 				fetchData();
@@ -26,19 +29,27 @@ export default function ArchiveProduct({product, isActive, fetchData}) {
 				notyf.error("Something went wrong");
 				fetchData();
 			}
-		})
+
+		} catch (error) {
+            notyf.error("Something went wrong");
+            console.error(error);
+        }
+
 	}
 
-	const activateToggle = () => {
-		fetch(`${process.env.REACT_APP_API_BASE_URL}/products/${productId}/activate`, {
-			method: "PATCH",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${localStorage.getItem("token")}`
-			}
-		})
-		.then(res => res.json())
-		.then(data => {
+	const activateToggle = async () => {
+
+		try {
+
+			const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products/${productId}/activate`, {
+				method: "PATCH",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${localStorage.getItem("token")}`
+				}
+			});
+
+			const data = await response.json();
 			if(data.success === true) {
 				notyf.success("Successfully Activated");
 				fetchData();
@@ -46,7 +57,12 @@ export default function ArchiveProduct({product, isActive, fetchData}) {
 				notyf.error("Something went wrong");
 				fetchData();
 			}
-		})
+
+		} catch (error) {
+            notyf.error("Something went wrong");
+            console.error(error);
+        }
+
 	}
 
 	return (

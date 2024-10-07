@@ -28,24 +28,26 @@ export default function EditProduct({product, fetchData}) {
 		setPrice(0);
 	}
 
-	const editProduct = (e, productId) => {
+	async function editProduct(e, productId) {
+
 		e.preventDefault();
 
-		fetch(`${process.env.REACT_APP_API_BASE_URL}/products/${productId}/update`, {
-			method: "PATCH",
-			headers: {
-				"Content-Type": "application/json",
-				Authorization: `Bearer ${localStorage.getItem("token")}`
-			},
-			body: JSON.stringify({
-				name: name,
-				description: description,
-				price: price
-			})
-		})
-		.then(res => res.json())
-		.then(data => {
+		try {
 
+			const response = await fetch(`${process.env.REACT_APP_API_BASE_URL}/products/${productId}/update`, {
+				method: "PATCH",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${localStorage.getItem("token")}`
+				},
+				body: JSON.stringify({
+					name: name,
+					description: description,
+					price: price
+				})
+			});
+
+			const data = await response.json();
 			if(data.success === true) {
 				notyf.success("Product Updated");
 				closeEdit();
@@ -56,7 +58,11 @@ export default function EditProduct({product, fetchData}) {
 				fetchData();
 			}
 
-		})
+		} catch (error) {
+            notyf.error("Something went wrong");
+            console.error(error);
+        }
+
 	}
 
 	return (
